@@ -8,15 +8,15 @@ namespace InvoiceDataExtraction.Models.Responses;
 
 public class InvoiceLineItem
 {
-    public decimal LineItemDiscount { get; set; }
+    public decimal? LineItemDiscount { get; set; }
 
-    public decimal TaxAmount { get; set; }
+    public decimal? TaxAmount { get; set; }
 
-    public decimal ExtendedAmount { get; set; }
+    public decimal? ExtendedAmount { get; set; }
 
-    public decimal UnitPrice { get; set; }
+    public decimal? UnitPrice { get; set; }
 
-    public decimal QuantityOrdered { get; set; }
+    public decimal? QuantityOrdered { get; set; }
 
     public string Taxable { get; set; }
 

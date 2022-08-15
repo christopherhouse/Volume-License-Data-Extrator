@@ -15,9 +15,9 @@ namespace InvoiceDataExtraction.Models.Responses
 
         public string InvoiceNumber { get; set; }
 
-        public decimal ExtractedInvoiceTotal { get; set; }
+        public decimal? ExtractedInvoiceTotal { get; set; }
 
-        public decimal ComputedInvoiceTotal { get; set; }
+        public decimal? ComputedInvoiceTotal { get; set; }
 
         public bool ExtractedValuesMatchComputed { get; set; }
 

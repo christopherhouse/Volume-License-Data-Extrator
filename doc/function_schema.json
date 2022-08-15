@@ -1,0 +1,159 @@
+{
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "instanceId": {
+            "type": "string"
+        },
+        "runtimeStatus": {
+            "type": "string"
+        },
+        "input": {
+            "type": "object",
+            "properties": {
+                "InvoiceSasUri": {
+                    "type": "string"
+                }
+            }
+        },
+        "customStatus": {},
+        "output": {
+            "type": "object",
+            "properties": {
+                "InvoiceNumber": {
+                    "type": "string"
+                },
+                "ExtractedInvoiceTotal": {
+                    "type": "number"
+                },
+                "ComputedInvoiceTotal": {
+                    "type": "number"
+                },
+                "ExtractedValuesMatchComputed": {
+                    "type": "boolean"
+                },
+                "EnrollmentNumber": {
+                    "type": "string"
+                },
+                "LineItems": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "LineItemDiscount": {
+                                "type": [ "number", "null" ]
+                            },
+                            "TaxAmount": {
+                                "type": [ "number", "null" ]
+                            },
+                            "ExtendedAmount": {
+                                "type": [ "number", "null" ]
+                            },
+                            "UnitPrice": {
+                                "type": [ "number", "null" ]
+                            },
+                            "QuantityOrdered": {
+                                "type": [ "number", "null" ]
+                            },
+                            "Taxable": {
+                                "type": [ "string", "null" ]
+                            },
+                            "BillingOption": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Delivery": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Period": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Pool": {
+                                "type": [ "string", "null" ]
+                            },
+                            "LicenseType": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Description": {
+                                "type": [ "string", "null" ]
+                            },
+                            "MicrosoftPartNumber": {
+                                "type": [ "string", "null" ]
+                            },
+                            "UsageCountry": {
+                                "type": [ "string", "null" ]
+                            },
+                            "LineNumber": {
+                                "type": [ "string", "null" ]
+                            }
+                        },
+                        "required": [
+                        ]
+                    }
+                },
+                "UnparsedLineItems": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "LineItemDiscount": {
+                                "type": [ "string", "null" ]
+                            },
+                            "TaxAmount": {
+                                "type": [ "string", "null" ]
+                            },
+                            "ExtendedAmount": {
+                                "type": [ "string", "null" ]
+                            },
+                            "UnitPrice": {
+                                "type": [ "string", "null" ]
+                            },
+                            "QuantityOrdered": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Taxable": {
+                                "type": [ "string", "null" ]
+                            },
+                            "BillingOption": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Delivery": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Period": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Pool": {
+                                "type": [ "string", "null" ]
+                            },
+                            "LicenseType": {
+                                "type": [ "string", "null" ]
+                            },
+                            "Description": {
+                                "type": [ "string", "null" ]
+                            },
+                            "MicrosoftPartNumber": {
+                                "type": [ "string", "null" ]
+                            },
+                            "UsageCountry": {
+                                "type": [ "string", "null" ]
+                            },
+                            "LineNumber": {
+                                "type": [ "string", "null" ]
+                            }
+                        },
+                        "required": [
+                        ]
+                    }
+                }
+            }
+        },
+        "createdTime": {
+            "type": "string"
+        },
+        "lastUpdatedTime": {
+            "type": "string"
+        }
+    }
+}
