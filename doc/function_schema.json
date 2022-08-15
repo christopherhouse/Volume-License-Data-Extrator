@@ -23,19 +23,19 @@
             "type": "object",
             "properties": {
                 "InvoiceNumber": {
-                    "type": "string"
+                    "type": [ "string", "null" ]
                 },
                 "ExtractedInvoiceTotal": {
-                    "type": "number"
+                    "type": [ "number", "null " ]
                 },
                 "ComputedInvoiceTotal": {
-                    "type": "number"
+                    "type": [ "number", "null " ]
                 },
                 "ExtractedValuesMatchComputed": {
                     "type": "boolean"
                 },
                 "EnrollmentNumber": {
-                    "type": "string"
+                    "type": [ "string", "null" ]
                 },
                 "LineItems": {
                     "type": "array",

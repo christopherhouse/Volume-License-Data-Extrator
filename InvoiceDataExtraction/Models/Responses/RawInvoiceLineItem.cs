@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System;
-using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 
 namespace InvoiceDataExtraction.Models.Responses;
 
@@ -127,19 +126,6 @@ public class RawInvoiceLineItem
         return lineItem;
     }
 
-    private static decimal GetQuantityOrdered(DocumentField field, string lineNumber)
-    {
-        if (decimal.TryParse(field.Content, out var decimalQuantity))
-        {
-            return decimalQuantity;
-        }
-        else
-        {
-            throw new FormatException(
-                $"Could not convert Quantity Ordered to integer on line number {lineNumber}.  Input value was {field.Content}");
-        }
-    }
-
     private static string GetLineNumber(IReadOnlyDictionary<string, DocumentField> fields)
     {
         string lineNumber = "UNKNOWN";
@@ -151,28 +137,24 @@ public class RawInvoiceLineItem
         return lineNumber;
     }
 
-    private static decimal ParseDecimal(string content, string fieldName, string lineNumber)
+    private static decimal? ParseDecimal(string content, string fieldName, string lineNumber)
     {
-        var fieldValue = Regex.Replace(content, @"\p{C}+", string.Empty);
-
-        if (fieldValue.Contains("62,361.22"))
-        {
-            // problem
-            var thing = Regex.Replace(fieldValue, @"\p{C}+", string.Empty);
-            Console.WriteLine(thing);
-        }
+        var parsedValue = default(decimal?);
 
         var culture = CultureInfo.CreateSpecificCulture("en-US");
 
+        var fieldValue = string.IsNullOrWhiteSpace(content) ? default(decimal).ToString(culture) : Regex.Replace(content, @"\p{C}+", string.Empty);
 
         if (decimal.TryParse(fieldValue, NumberStyles.Any, culture, out var parsedDecimal))
         {
-            return parsedDecimal;
+            parsedValue = parsedDecimal;
         }
         else
         {
-            throw new FormatException(
+            Console.WriteLine(
                 $"Unable to parse decimal value from field {fieldName}, line number {lineNumber}.  Input value was {content}");
         }
+
+        return parsedValue;
     }
 }
