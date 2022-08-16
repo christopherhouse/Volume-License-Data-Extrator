@@ -8,7 +8,7 @@ namespace InvoiceDataExtraction.Models.Responses;
 
 public class RawInvoiceLineItem
 {
-    public string LineItemDiscount { get; set; }
+    public string LineItemAdditionalCharge { get; set; }
 
     public string TaxAmount { get; set; }
 
@@ -56,7 +56,7 @@ public class RawInvoiceLineItem
             UnitPrice = ParseDecimal(this.UnitPrice, nameof(UnitPrice), this.LineNumber),
             ExtendedAmount = ParseDecimal(this.ExtendedAmount, nameof(ExtendedAmount), this.LineNumber),
             TaxAmount = ParseDecimal(this.TaxAmount, nameof(TaxAmount), this.LineNumber),
-            LineItemDiscount = ParseDecimal(this.LineItemDiscount, nameof(LineItemDiscount), this.LineNumber)
+            LineItemAdditionalCharge = ParseDecimal(this.LineItemAdditionalCharge, nameof(LineItemAdditionalCharge), this.LineNumber)
         };
     }
 
@@ -115,10 +115,11 @@ public class RawInvoiceLineItem
                 case "Tax Amount":
                     lineItem.TaxAmount = content;
                     break;
-                case "Line Item Discount":
-                    lineItem.LineItemDiscount = content;
+                case "Line Item Additional Charge":
+                    lineItem.LineItemAdditionalCharge = content;
                     break;
                 default:
+                    Console.WriteLine($"Unhandled field encountered: {field.Key}");
                     break;
             }
         }

@@ -71,17 +71,20 @@ public class ExtractInvoiceDataResponse
             }
         }
 
-        response.ComputedInvoiceTotal = response.LineItems.Sum(_ => _.ExtendedAmount);
+        response.ComputedInvoiceTotal =
+            response.LineItems.Sum(_ => _.ExtendedAmount + (_.LineItemAdditionalCharge ?? default(decimal)));
+
         response.ExtractedValuesMatchComputed = response.ComputedInvoiceTotal == response.ExtractedInvoiceTotal;
 
         return response;
     }
 
-    private static decimal ParseDecimal(string content, string fieldName)
+    private static decimal? ParseDecimal(string content, string fieldName)
     {
         var culture = CultureInfo.CreateSpecificCulture("en-US");
         var fieldValue = string.IsNullOrWhiteSpace(content) ? default(decimal).ToString(culture) : Regex.Replace(content, @"\p{C}+", string.Empty);
-
+        var parsedValue = default(decimal?);
+        
         if (fieldValue.Contains("62,361.22"))
         {
             // problem
@@ -93,12 +96,14 @@ public class ExtractInvoiceDataResponse
 
         if (decimal.TryParse(fieldValue, NumberStyles.Any, culture, out var parsedDecimal))
         {
-            return parsedDecimal;
+            parsedValue = parsedDecimal;
         }
         else
         {
-            throw new FormatException(
+            Console.WriteLine(
                 $"Unable to parse decimal value from field {fieldName}.  Input value was {content}");
         }
+
+        return parsedValue;
     }
 }

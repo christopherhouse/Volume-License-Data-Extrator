@@ -2,7 +2,7 @@
 
 public class InvoiceLineItem
 {
-    public decimal? LineItemDiscount { get; set; }
+    public decimal? LineItemAdditionalCharge { get; set; }
 
     public decimal? TaxAmount { get; set; }
 

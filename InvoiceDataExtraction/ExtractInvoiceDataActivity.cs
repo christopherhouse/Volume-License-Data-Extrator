@@ -13,16 +13,15 @@ namespace InvoiceDataExtraction;
 
 public class ExtractInvoiceDataActivity
 {
-    private const string MODEL_ID = "invoices-2022-08-10-1536";
-
     [FunctionName(Constants.FunctionNames.ExtractInvoiceDataActivity)]
     public static async Task<ExtractInvoiceDataResponse> ExtractInvoiceData([ActivityTrigger] ExtractInvoiceDataRequest request, ILogger log)
     {
         ExtractInvoiceDataResponse invoiceData = null;
         var endpoint = Environment.GetEnvironmentVariable("formsRecognizerEndpoint");
         var key = Environment.GetEnvironmentVariable("formsRecogniserKey");
+        var modelId = Environment.GetEnvironmentVariable("modelId");
 
-        if (!string.IsNullOrWhiteSpace(endpoint) && !string.IsNullOrWhiteSpace(key))
+        if (!string.IsNullOrWhiteSpace(endpoint) && !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(modelId))
         {
             var credential = new AzureKeyCredential(key);
 
@@ -31,7 +30,7 @@ public class ExtractInvoiceDataActivity
             try
             {
                 var operation = await documentAnalysisClient.AnalyzeDocumentFromUriAsync(WaitUntil.Completed,
-                    MODEL_ID,
+                    modelId,
                     request.InvoiceSasUri);
 
                 var results = operation.Value;
