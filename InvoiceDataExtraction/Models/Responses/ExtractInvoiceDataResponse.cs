@@ -55,7 +55,11 @@ public class ExtractInvoiceDataResponse
                             var parsedLineItem = rawLineItem.AsInvoiceLineItem();
                             response.LineItems.Add(parsedLineItem);
                         }
-                        catch (Exception e)
+                        catch (InvalidOperationException)
+                        {
+                            throw;
+                        }
+                        catch (Exception)
                         {
                             Console.WriteLine($"Adding raw line item to UnparsedLineItems");
                             response.UnparsedLineItems.Add(rawLineItem);

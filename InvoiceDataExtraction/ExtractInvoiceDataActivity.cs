@@ -5,6 +5,8 @@ using Azure;
 using Azure.AI.FormRecognizer.DocumentAnalysis;
 using InvoiceDataExtraction.Models.Requests;
 using InvoiceDataExtraction.Models.Responses;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Logging;
@@ -13,10 +15,17 @@ namespace InvoiceDataExtraction;
 
 public class ExtractInvoiceDataActivity
 {
-    [FunctionName(Constants.FunctionNames.ExtractInvoiceDataActivity)]
-    public static async Task<ExtractInvoiceDataResponse> ExtractInvoiceData([ActivityTrigger] ExtractInvoiceDataRequest request, ILogger log)
+    private readonly TelemetryClient _telemetryClient;
+
+    public ExtractInvoiceDataActivity(TelemetryClient telemetryClient)
     {
-        ExtractInvoiceDataResponse invoiceData = null;
+        _telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
+    }
+
+    [FunctionName(Constants.FunctionNames.ExtractInvoiceDataActivity)]
+    public async Task<ExtractInvoiceDataResponse> ExtractInvoiceData([ActivityTrigger] ExtractInvoiceDataRequest request, ILogger log)
+    {
+        ExtractInvoiceDataResponse invoiceData;
         var endpoint = Environment.GetEnvironmentVariable("formsRecognizerEndpoint");
         var key = Environment.GetEnvironmentVariable("formsRecogniserKey");
         var modelId = Environment.GetEnvironmentVariable("modelId");
@@ -51,6 +60,20 @@ public class ExtractInvoiceDataActivity
         {
             throw new ApplicationException("Missing configuration");
         }
+
+        var @event = new EventTelemetry("Invoice Processed")
+        {
+            Properties =
+            {
+                {nameof(invoiceData.InvoiceNumber), invoiceData.InvoiceNumber},
+                {nameof(invoiceData.ExtractedInvoiceTotal), invoiceData.ExtractedInvoiceTotal != null ? invoiceData.ExtractedInvoiceTotal.ToString() : "NULL"},
+                {nameof(invoiceData.ComputedInvoiceTotal), invoiceData.ComputedInvoiceTotal != null ? invoiceData.ComputedInvoiceTotal.ToString() : "NULL"},
+                {nameof(invoiceData.ExtractedValuesMatchComputed), invoiceData.ExtractedValuesMatchComputed.ToString()},
+                {nameof(invoiceData.EnrollmentNumber), invoiceData.EnrollmentNumber}
+            }
+        };
+
+        _telemetryClient.TrackEvent(@event);
 
         return invoiceData;
     }

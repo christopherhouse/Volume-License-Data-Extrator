@@ -149,6 +149,11 @@ public class RawInvoiceLineItem
         if (decimal.TryParse(fieldValue, NumberStyles.Any, culture, out var parsedDecimal))
         {
             parsedValue = parsedDecimal;
+
+            if (parsedValue > 100m)
+            {
+                throw new InvalidOperationException("This is expensive, probably ought to check it out");
+            }
         }
         else
         {

@@ -2,6 +2,9 @@
     "version": "2.0",
   "logging": {
     "applicationInsights": {
+      "snapshotConfiguration": {
+        "isEnabled": true
+      },
       "samplingSettings": {
         "isEnabled": true,
         "excludedTypes": "Request;Dependency;Event;Exception"
