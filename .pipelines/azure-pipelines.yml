@@ -1,18 +1,15 @@
-# .NET Core Function App to Windows on Azure
-# Build a .NET Core function app and deploy it to Azure as a Windows function App.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - somebogusbranch
 
 variables:
-  vmImageName: 'ubuntu-latest'
-  azureSubscription: '3d514ad5-b23e-4ab6-a3dd-0175e28e21d0'
-  functionAppName: 'InvoiceDataExtraction20220811103713'
-  workingDirectory: 'InvoiceDataExtraction'
+  vmImageName: ubuntu-latest
+  azureSubscription: 3d514ad5-b23e-4ab6-a3dd-0175e28e21d0
+  functionAppName: InvoiceDataExtraction20220811103713
+  workingDirectory: InvoiceDataExtraction'
   storageResourceName: mystorageacct
   formsRecognizerResourceName: myfrresource
+  appInsightsResourceName: myappinsights
+  formsRecognizerModelId: invoices-2022-11-16
 
 
 stages:
