@@ -2,11 +2,14 @@
     "version": "2.0",
   "logging": {
     "applicationInsights": {
+      "snapshotConfiguration": {
+        "isEnabled": true
+      },
       "samplingSettings": {
         "isEnabled": true,
-        "excludedTypes": "Request"
+        "excludedTypes": "Request;Dependency;Event;Exception"
       }
     }
   },
-    "functionTimeout": "-1"
+    "functionTimeout": "00:10:00"
 }

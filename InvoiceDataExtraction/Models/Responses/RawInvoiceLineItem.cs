@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System;
-using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 
 namespace InvoiceDataExtraction.Models.Responses;
 
 public class RawInvoiceLineItem
 {
-    public string LineItemDiscount { get; set; }
+    public string LineItemAdditionalCharge { get; set; }
 
     public string TaxAmount { get; set; }
 
@@ -39,6 +38,16 @@ public class RawInvoiceLineItem
 
     public string LineNumber { get; set; }
 
+    public float? UnitPriceConfidence { get; set; }
+
+    public float? ExtendedAmountConfidence { get; set; }
+
+    public float? QuantityOrderedConfidence { get; set; }
+
+    public float? LineItemAdditionalChargeConfidence { get; set; }
+    
+    public float? LineNumberConfidence { get; set; }
+
     public InvoiceLineItem AsInvoiceLineItem()
     {
         return new InvoiceLineItem
@@ -57,7 +66,12 @@ public class RawInvoiceLineItem
             UnitPrice = ParseDecimal(this.UnitPrice, nameof(UnitPrice), this.LineNumber),
             ExtendedAmount = ParseDecimal(this.ExtendedAmount, nameof(ExtendedAmount), this.LineNumber),
             TaxAmount = ParseDecimal(this.TaxAmount, nameof(TaxAmount), this.LineNumber),
-            LineItemDiscount = ParseDecimal(this.LineItemDiscount, nameof(LineItemDiscount), this.LineNumber)
+            LineItemAdditionalCharge = ParseDecimal(this.LineItemAdditionalCharge, nameof(LineItemAdditionalCharge), this.LineNumber),
+            UnitPriceConfidence = this.UnitPriceConfidence,
+            ExtendedAmountConfidence = this.ExtendedAmountConfidence,
+            QuantityOrderedConfidence = this.QuantityOrderedConfidence,
+            LineItemAdditionalChargeConfidence = this.LineItemAdditionalChargeConfidence,
+            LineNumberConfidence = this.LineNumberConfidence
         };
     }
 
@@ -71,11 +85,11 @@ public class RawInvoiceLineItem
         foreach (var field in fieldDictionary)
         {
             var content = field.Value.Content;
-
             switch (field.Key)
             {
                 case "Line Number":
                     lineItem.LineNumber = lineNumber;
+                    lineItem.LineNumberConfidence = field.Value.Confidence;
                     break;
                 case "Usage Country":
                     lineItem.UsageCountry = content;
@@ -106,38 +120,30 @@ public class RawInvoiceLineItem
                     break;
                 case "Quantity Ordered":
                     lineItem.QuantityOrdered = content;
+                    lineItem.QuantityOrderedConfidence = field.Value.Confidence;
                     break;
                 case "Unit Price":
                     lineItem.UnitPrice = content;
+                    lineItem.UnitPriceConfidence = field.Value.Confidence;
                     break;
                 case "Extended Amount":
                     lineItem.ExtendedAmount = content;
+                    lineItem.ExtendedAmountConfidence = field.Value.Confidence;
                     break;
                 case "Tax Amount":
                     lineItem.TaxAmount = content;
                     break;
-                case "Line Item Discount":
-                    lineItem.LineItemDiscount = content;
+                case "Line Item Additional Charge":
+                    lineItem.LineItemAdditionalCharge = content;
+                    lineItem.LineItemAdditionalChargeConfidence = field.Value.Confidence;
                     break;
                 default:
+                    Console.WriteLine($"Unhandled field encountered: {field.Key}");
                     break;
             }
         }
 
         return lineItem;
-    }
-
-    private static decimal GetQuantityOrdered(DocumentField field, string lineNumber)
-    {
-        if (decimal.TryParse(field.Content, out var decimalQuantity))
-        {
-            return decimalQuantity;
-        }
-        else
-        {
-            throw new FormatException(
-                $"Could not convert Quantity Ordered to integer on line number {lineNumber}.  Input value was {field.Content}");
-        }
     }
 
     private static string GetLineNumber(IReadOnlyDictionary<string, DocumentField> fields)
@@ -151,28 +157,24 @@ public class RawInvoiceLineItem
         return lineNumber;
     }
 
-    private static decimal ParseDecimal(string content, string fieldName, string lineNumber)
+    private static decimal? ParseDecimal(string content, string fieldName, string lineNumber)
     {
-        var fieldValue = Regex.Replace(content, @"\p{C}+", string.Empty);
-
-        if (fieldValue.Contains("62,361.22"))
-        {
-            // problem
-            var thing = Regex.Replace(fieldValue, @"\p{C}+", string.Empty);
-            Console.WriteLine(thing);
-        }
+        var parsedValue = default(decimal?);
 
         var culture = CultureInfo.CreateSpecificCulture("en-US");
 
+        var fieldValue = string.IsNullOrWhiteSpace(content) ? default(decimal).ToString(culture) : Regex.Replace(content, @"\p{C}+", string.Empty);
 
         if (decimal.TryParse(fieldValue, NumberStyles.Any, culture, out var parsedDecimal))
         {
-            return parsedDecimal;
+            parsedValue = parsedDecimal;
         }
         else
         {
-            throw new FormatException(
+            Console.WriteLine(
                 $"Unable to parse decimal value from field {fieldName}, line number {lineNumber}.  Input value was {content}");
         }
+
+        return parsedValue;
     }
 }
