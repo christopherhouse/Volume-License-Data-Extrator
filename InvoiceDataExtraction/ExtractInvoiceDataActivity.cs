@@ -30,6 +30,7 @@ public class ExtractInvoiceDataActivity
         var key = Environment.GetEnvironmentVariable("formsRecogniserKey");
         var modelId = Environment.GetEnvironmentVariable("modelId");
 
+
         if (!string.IsNullOrWhiteSpace(endpoint) && !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(modelId))
         {
             var credential = new AzureKeyCredential(key);

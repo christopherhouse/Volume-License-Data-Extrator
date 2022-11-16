@@ -38,6 +38,16 @@ public class RawInvoiceLineItem
 
     public string LineNumber { get; set; }
 
+    public float? UnitPriceConfidence { get; set; }
+
+    public float? ExtendedAmountConfidence { get; set; }
+
+    public float? QuantityOrderedConfidence { get; set; }
+
+    public float? LineItemAdditionalChargeConfidence { get; set; }
+    
+    public float? LineNumberConfidence { get; set; }
+
     public InvoiceLineItem AsInvoiceLineItem()
     {
         return new InvoiceLineItem
@@ -56,7 +66,12 @@ public class RawInvoiceLineItem
             UnitPrice = ParseDecimal(this.UnitPrice, nameof(UnitPrice), this.LineNumber),
             ExtendedAmount = ParseDecimal(this.ExtendedAmount, nameof(ExtendedAmount), this.LineNumber),
             TaxAmount = ParseDecimal(this.TaxAmount, nameof(TaxAmount), this.LineNumber),
-            LineItemAdditionalCharge = ParseDecimal(this.LineItemAdditionalCharge, nameof(LineItemAdditionalCharge), this.LineNumber)
+            LineItemAdditionalCharge = ParseDecimal(this.LineItemAdditionalCharge, nameof(LineItemAdditionalCharge), this.LineNumber),
+            UnitPriceConfidence = this.UnitPriceConfidence,
+            ExtendedAmountConfidence = this.ExtendedAmountConfidence,
+            QuantityOrderedConfidence = this.QuantityOrderedConfidence,
+            LineItemAdditionalChargeConfidence = this.LineItemAdditionalChargeConfidence,
+            LineNumberConfidence = this.LineNumberConfidence
         };
     }
 
@@ -70,11 +85,11 @@ public class RawInvoiceLineItem
         foreach (var field in fieldDictionary)
         {
             var content = field.Value.Content;
-
             switch (field.Key)
             {
                 case "Line Number":
                     lineItem.LineNumber = lineNumber;
+                    lineItem.LineNumberConfidence = field.Value.Confidence;
                     break;
                 case "Usage Country":
                     lineItem.UsageCountry = content;
@@ -105,18 +120,22 @@ public class RawInvoiceLineItem
                     break;
                 case "Quantity Ordered":
                     lineItem.QuantityOrdered = content;
+                    lineItem.QuantityOrderedConfidence = field.Value.Confidence;
                     break;
                 case "Unit Price":
                     lineItem.UnitPrice = content;
+                    lineItem.UnitPriceConfidence = field.Value.Confidence;
                     break;
                 case "Extended Amount":
                     lineItem.ExtendedAmount = content;
+                    lineItem.ExtendedAmountConfidence = field.Value.Confidence;
                     break;
                 case "Tax Amount":
                     lineItem.TaxAmount = content;
                     break;
                 case "Line Item Additional Charge":
                     lineItem.LineItemAdditionalCharge = content;
+                    lineItem.LineItemAdditionalChargeConfidence = field.Value.Confidence;
                     break;
                 default:
                     Console.WriteLine($"Unhandled field encountered: {field.Key}");
@@ -149,11 +168,6 @@ public class RawInvoiceLineItem
         if (decimal.TryParse(fieldValue, NumberStyles.Any, culture, out var parsedDecimal))
         {
             parsedValue = parsedDecimal;
-
-            if (parsedValue > 100m)
-            {
-                throw new InvalidOperationException("This is expensive, probably ought to check it out");
-            }
         }
         else
         {

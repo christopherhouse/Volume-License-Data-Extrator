@@ -31,4 +31,14 @@ public class InvoiceLineItem
     public string UsageCountry { get; set; }
 
     public string LineNumber { get; set; }
+
+    public float? UnitPriceConfidence { get; set; }
+
+    public float? ExtendedAmountConfidence { get; set; }
+
+    public float? QuantityOrderedConfidence { get; set; }
+
+    public float? LineItemAdditionalChargeConfidence { get; set; }
+
+    public float? LineNumberConfidence { get; set; }
 }

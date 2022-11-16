@@ -32,7 +32,6 @@ public static class ExtractInvoiceDataOrchestrator
         var instance =
             await starter.StartNewAsync(Constants.FunctionNames.OrchestratorFunction, null, extractRequest);
             
-
         log.LogInformation($"Started orchestration with ID = '{instance}'.");
 
         return starter.CreateCheckStatusResponse(req, instance);

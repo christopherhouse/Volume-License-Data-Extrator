@@ -17,13 +17,23 @@ public class ExtractInvoiceDataResponse
 
     public string InvoiceNumber { get; set; }
 
+    public float? InvoiceNumberConfidence { get; set; }
+
     public decimal? ExtractedInvoiceTotal { get; set; }
+
+    public float? ExtractedInvoiceTotalConfidence { get; set; }
 
     public decimal? ComputedInvoiceTotal { get; set; }
 
     public bool ExtractedValuesMatchComputed { get; set; }
 
     public string EnrollmentNumber { get; set; }
+
+    public float? EnrollmentNumberConfidence { get; set; }
+
+    public string InvoiceDate { get; set; }
+
+    public float? InvoiceDateConfidence { get; set; }
 
     public IList<InvoiceLineItem> LineItems { get; }
 
@@ -39,9 +49,11 @@ public class ExtractInvoiceDataResponse
             {
                 case "Invoice Number":
                     response.InvoiceNumber = field.Value.Content;
+                    response.InvoiceNumberConfidence = field.Value.Confidence;
                     break;
                 case "Invoice Total":
                     response.ExtractedInvoiceTotal = ParseDecimal(field.Value.Content, nameof(ExtractedInvoiceTotal));
+                    response.ExtractedInvoiceTotalConfidence = field.Value.Confidence;
                     break;
                 case "Line Items":
                     var lineItems = field.Value.AsList();
@@ -69,6 +81,11 @@ public class ExtractInvoiceDataResponse
                     break;
                 case "Enrollment Number":
                     response.EnrollmentNumber = field.Value.Content;
+                    response.EnrollmentNumberConfidence = field.Value.Confidence;
+                    break;
+                case "Invoice Date":
+                    response.InvoiceDate = field.Value.Content;
+                    response.InvoiceDateConfidence = field.Value.Confidence;
                     break;
                 default:
                     break;
@@ -88,14 +105,6 @@ public class ExtractInvoiceDataResponse
         var culture = CultureInfo.CreateSpecificCulture("en-US");
         var fieldValue = string.IsNullOrWhiteSpace(content) ? default(decimal).ToString(culture) : Regex.Replace(content, @"\p{C}+", string.Empty);
         var parsedValue = default(decimal?);
-        
-        if (fieldValue.Contains("62,361.22"))
-        {
-            // problem
-            var thing = Regex.Replace(fieldValue, @"\p{C}+", string.Empty);
-            Console.WriteLine(thing);
-        }
-
 
 
         if (decimal.TryParse(fieldValue, NumberStyles.Any, culture, out var parsedDecimal))

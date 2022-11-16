@@ -26,10 +26,10 @@
                     "type": [ "string", "null" ]
                 },
                 "ExtractedInvoiceTotal": {
-                    "type": [ "number", "null " ]
+                    "type": [ "number", "null" ]
                 },
                 "ComputedInvoiceTotal": {
-                    "type": [ "number", "null " ]
+                    "type": [ "number", "null" ]
                 },
                 "ExtractedValuesMatchComputed": {
                     "type": "boolean"
