@@ -22,13 +22,6 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
-    - task: Bash@3
-      displayName: dir list
-      inputs:
-        targetType: 'inline'
-        script: |
-          ls -la $(Build.SourcesDirectory)
-
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
