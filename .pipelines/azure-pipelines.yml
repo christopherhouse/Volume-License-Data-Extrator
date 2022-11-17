@@ -1,0 +1,88 @@
+trigger:
+- main
+
+variables:
+  vmImageName: ubuntu-latest
+  azureSubscription: 3d514ad5-b23e-4ab6-a3dd-0175e28e21d0
+  resourceGroupName: INVOICE-DATA
+  functionAppName: invdeploytest
+  workingDirectory: InvoiceDataExtraction'
+  storageResourceName: invoicedatafunctest
+  formsRecognizerResourceName: K-INVOICE-SCUS
+  appInsightsResourceName: invdeploytest
+  formsRecognizerModelId: invoices-2022-11-16
+
+stages:
+- stage: Build
+  displayName: Build stage
+
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        command: 'build'
+        projects: |
+          $(workingDirectory)/*.csproj
+        arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
+
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifact: drop
+
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  condition: succeeded()
+
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: development
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+
+          steps:
+          - task: AzureFunctionApp@1
+            displayName: Azure functions app deploy
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appType: functionApp
+              appName: $(functionAppName)
+              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+          
+          - task: AzureCLI@2
+            displayName: Update App Settings
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                # az cli needs an extension for App Insights, so turn on dynamic install to avoid the install prompt
+                az config set extension.use_dynamic_install=yes_without_prompt
+
+                # Get keys and such from resources and stuff them into variables
+                STORAGE_CONNECTION_STRING=(az storage account show-connection-string -g $(resourceGroupName) -n $(storageResourceName) --query "connectionString" -o tsv)
+                FORMS_RECOGNIZER_KEY=(az cognitiveservices account keys list -g $(resourceGroupName) -n $(formsRecognizerResourceName) --query "key1" -o tsv)
+                FORMS_RECGONIZER_ENDPOINT=(az cognitiveservices account show -g $(resourceGroupName) -n $(formsRecognizerResourceName) --query "properties.endpoint" -o tsv)
+                APP_INSIGHTS_CONNECTION_STRING=(az monitor app-insights component show -g $(resourceGroupName) -a $(appInsightsResourceName) --query "connectionString" -o tsv)
+
+                # Update the Function config using the values we got from az cli
+                az webapp config appsettings set --name $(functionAppName) --resource-group $(resourceGroupName) --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" APPLICATION_INSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECOGNIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=$(formsRecognizerModelId)"

@@ -23,61 +23,34 @@
             "type": "object",
             "properties": {
                 "InvoiceNumber": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": "string"
                 },
                 "InvoiceNumberConfidence": {
-                    "type": [
-                        "number",
-                        "null"
-                    ]
+                    "type": "number"
                 },
                 "ExtractedInvoiceTotal": {
-                    "type": [
-                        "number",
-                        "null"
-                    ]
+                    "type": "number"
                 },
                 "ExtractedInvoiceTotalConfidence": {
-                    "type": [
-                        "number",
-                        "null"
-                    ]
+                    "type": "number"
                 },
                 "ComputedInvoiceTotal": {
-                    "type": [
-                        "number",
-                        "null"
-                    ]
+                    "type": "number"
                 },
                 "ExtractedValuesMatchComputed": {
-                    "type": [
-                        "boolean",
-                        "null"
-                    ]
+                    "type": "boolean"
                 },
                 "EnrollmentNumber": {
                     "type": "string"
                 },
                 "EnrollmentNumberConfidence": {
-                    "type": [
-                        "number",
-                        "null"
-                    ]
+                    "type": "number"
                 },
                 "InvoiceDate": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": "string"
                 },
                 "InvoiceDateConfidence": {
-                    "type": [
-                        "number",
-                        "null"
-                    ]
+                    "type": "number"
                 },
                 "LineItems": {
                     "type": "array",
@@ -85,120 +58,65 @@
                         "type": "object",
                         "properties": {
                             "LineItemAdditionalCharge": {
-                                "type": [
-                                    "number",
-                                    "null"
-                                ]
+                                "type": "number"
                             },
                             "TaxAmount": {
-                                "type": [
-                                    "number",
-                                    "null"
-                                ]
+                                "type": "number"
                             },
                             "ExtendedAmount": {
-                                "type": [
-                                    "number",
-                                    "null"
-                                ]
+                                "type": "number"
                             },
                             "UnitPrice": {
-                                "type": [
-                                    "number",
-                                    "null"
-                                ]
+                                "type": "number"
                             },
                             "QuantityOrdered": {
-                                "type": [
-                                    "number",
-                                    "null"
-                                ]
+                                "type": "number"
                             },
                             "Taxable": {
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
+                                "type": "string"
                             },
                             "BillingOption": {
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
+                                "type": "string"
                             },
                             "Delivery": {
-                                "type": [
-                                    "string",
-                                    "null"
-                                ]
+                                "type": "string"
+                            },
+                            "Period": {
+                                "type": "string"
+                            },
+                            "Pool": {
+                                "type": "string"
+                            },
+                            "LicenseType": {
+                                "type": "string"
+                            },
+                            "Description": {
+                                "type": "string"
+                            },
+                            "MicrosoftPartNumber": {
+                                "type": "string"
+                            },
+                            "UsageCountry": {
+                                "type": "string"
+                            },
+                            "LineNumber": {
+                                "type": "string"
+                            },
+                            "UnitPriceConfidence": {
+                                "type": "number"
+                            },
+                            "ExtendedAmountConfidence": {
+                                "type": "number"
+                            },
+                            "QuantityOrderedConfidence": {
+                                "type": "number"
+                            },
+                            "LineItemAdditionalChargeConfidence": {
+                                "type": "number"
+                            },
+                            "LineNumberConfidence": {
+                                "type": "number"
                             }
-                        },
-                        "Period": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
-                        },
-                        "Pool": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
-                        },
-                        "LicenseType": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
-                        },
-                        "Description": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
-                        },
-                        "MicrosoftPartNumber": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
-                        },
-                        "UsageCountry": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
-                        },
-                        "LineNumber": {
-                            "type": [
-                                "number",
-                                "null"
-                            ]
-                        },
-                        "UnitPriceConfidence": {
-                            "type": [
-                                "number",
-                                "null"
-                            ]
-                        },
-                        "ExtendedAmountConfidence": {
-                            "type": [
-                                "number",
-                                "null"
-                            ]
-                        },
-                        "QuantityOrderedConfidence": {
-                            "type": [
-                                "number",
-                                "null"
-                            ]
-                        },
-                        "LineItemAdditionalChargeConfidence": {},
-                        "LineNumberConfidence": {
-                            "type": [
-                                "number",
-                                "null"
-                            ]
                         }
                     },
                     "required": [
@@ -231,15 +149,9 @@
         }
     },
     "createdTime": {
-        "type": [
-            "string",
-            "null"
-        ]
+        "type": "string"
     },
     "lastUpdatedTime": {
-        "type": [
-            "string",
-            "null"
-        ]
+        "type": "string"
     }
 }
