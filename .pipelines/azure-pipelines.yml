@@ -1,18 +1,16 @@
 trigger:
-- somebogusbranch
+- main
 
 variables:
   vmImageName: ubuntu-latest
   azureSubscription: 3d514ad5-b23e-4ab6-a3dd-0175e28e21d0
-  functionAppName: InvoiceDataExtraction20220811103713
+  resourceGroupName: INVOICE-DATA
+  functionAppName: invdeploytest
   workingDirectory: InvoiceDataExtraction'
-  storageResourceName: mystorageacct
-  formsRecognizerResourceName: myfrresource
-  appInsightsResourceName: K-INVOICE-SCUS
+  storageResourceName: invoicedatafunctest
+  formsRecognizerResourceName: K-INVOICE-SCUS
+  appInsightsResourceName: invdeploytest
   formsRecognizerModelId: invoices-2022-11-16
-  formsRecognizerEndpoint:
-  appInsightsInstrumentationKey:
-  appInsightsConnectionString:
 
 stages:
 - stage: Build
@@ -53,7 +51,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: Deploy
-    environment: 'development'
+    environment: development
     pool:
       vmImage: $(vmImageName)
 
@@ -63,18 +61,28 @@ stages:
 
           steps:
           - task: AzureFunctionApp@1
-            displayName: 'Azure functions app deploy'
+            displayName: Azure functions app deploy
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: $(azureSubscription)
               appType: functionApp
               appName: $(functionAppName)
-              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
           
           - task: AzureCLI@2
             displayName: Update App Settings
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: $(azureSubscription)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
-                # az webapp config appsettings set --name $(functionAppName) --resource-group $(ResourceGroup) --settings "AzureWebJobsStorage=$(storageResourceName)" "APPINSIGHTS_INSTRUMENTATIONKEY=$(appInsightsInstrumentationKey)" "APPINSIGHTS_CONNECTIONSTRING=$(appInsightsConnectionString)" "FORMS_RECOGNIZER_ENDPOINT=$(formsRecognizerEndpoint)" "FORMS_RECOGNIZER_MODEL_ID=$(formsRecognizerModelId)"
+                # az cli needs an extension for App Insights, so turn on dynamic install to avoid the install prompt
+                az config set extension.use_dynamic_install=yes_without_prompt
+
+                # Get keys and such from resources and stuff them into variables
+                STORAGE_CONNECTION_STRING=(az storage account show-connection-string -g $(resourceGroupName) -n $(storageResourceName) --query "connectionString" -o tsv)
+                FORMS_RECOGNIZER_KEY=(az cognitiveservices account keys list -g $(resourceGroupName) -n $(formsRecognizerResourceName) --query "key1" -o tsv)
+                FORMS_RECGONIZER_ENDPOINT=(az cognitiveservices account show -g $(resourceGroupName) -n $(formsRecognizerResourceName) --query "properties.endpoint" -o tsv)
+                APP_INSIGHTS_CONNECTION_STRING=(az monitor app-insights component show -g $(resourceGroupName) -a $(appInsightsResourceName) --query "connectionString" -o tsv)
+
+                # Update the Function config using the values we got from az cli
+                az webapp config appsettings set --name $(functionAppName) --resource-group $(resourceGroupName) --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" APPLICATION_INSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECOGNIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=$(formsRecognizerModelId)"
