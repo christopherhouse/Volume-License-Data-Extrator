@@ -84,4 +84,4 @@ stages:
                 APP_INSIGHTS_CONNECTION_STRING=$(az monitor app-insights component show -g $(resourceGroupName) -a $(appInsightsResourceName) --query "connectionString" -o tsv)
 
                 # Update the Function config using the values we got from az cli
-                az webapp config appsettings set --name $(functionAppName) --resource-group $(resourceGroupName) --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" "APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECOGNIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=$(formsRecognizerModelId)"
+                az webapp config appsettings set --name $(functionAppName) --resource-group $(resourceGroupName) --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" "APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECGONIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=$(formsRecognizerModelId)"
