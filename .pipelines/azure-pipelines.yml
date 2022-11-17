@@ -8,9 +8,11 @@ variables:
   workingDirectory: InvoiceDataExtraction'
   storageResourceName: mystorageacct
   formsRecognizerResourceName: myfrresource
-  appInsightsResourceName: myappinsights
+  appInsightsResourceName: K-INVOICE-SCUS
   formsRecognizerModelId: invoices-2022-11-16
-
+  formsRecognizerEndpoint:
+  appInsightsInstrumentationKey:
+  appInsightsConnectionString:
 
 stages:
 - stage: Build
@@ -67,3 +69,12 @@ stages:
               appType: functionApp
               appName: $(functionAppName)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+          
+          - task: AzureCLI@2
+            displayName: Update App Settings
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                # az webapp config appsettings set --name $(functionAppName) --resource-group $(ResourceGroup) --settings "AzureWebJobsStorage=$(storageResourceName)" "APPINSIGHTS_INSTRUMENTATIONKEY=$(appInsightsInstrumentationKey)" "APPINSIGHTS_CONNECTIONSTRING=$(appInsightsConnectionString)" "FORMS_RECOGNIZER_ENDPOINT=$(formsRecognizerEndpoint)" "FORMS_RECOGNIZER_MODEL_ID=$(formsRecognizerModelId)"
