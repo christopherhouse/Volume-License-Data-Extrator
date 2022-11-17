@@ -6,7 +6,7 @@ variables:
   azureSubscription: 3d514ad5-b23e-4ab6-a3dd-0175e28e21d0
   resourceGroupName: INVOICE-DATA
   functionAppName: invdeploytest
-  workingDirectory: InvoiceDataExtraction'
+  workingDirectory: $(Build.SourcesDirectory)/InvoiceDataExtraction'
   storageResourceName: invoicedatafunctest
   formsRecognizerResourceName: K-INVOICE-SCUS
   appInsightsResourceName: invdeploytest
