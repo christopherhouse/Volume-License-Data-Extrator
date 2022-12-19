@@ -1,0 +1,72 @@
+name: Customer Work/Volume-License-Data-Extrator
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+env:
+  appInsightsResourceName: invdeploytest
+  azureSubscription: 3d514ad5-b23e-4ab6-a3dd-0175e28e21d0
+  formsRecognizerModelId: invoices-2022-11-16
+  formsRecognizerResourceName: K-INVOICE-SCUS
+  functionAppName: invdeploytest
+  resourceGroupName: INVOICE-DATA
+  storageResourceName: invoicedatafunctest
+  vmImageName: ubuntu-latest
+jobs:
+  Build-Build:
+    name: Build
+    runs-on:
+      - self-hosted
+      - "${{ env.vmImageName }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3.1.0
+    # The dotnet CLI does not accept glob patterns. Consider using a solution file to act on multiple projects at once.
+    - name: Build
+      run: dotnet build ${{ github.workspace }}/InvoiceDataExtraction/*.csproj --output ${{ github.workspace }}/publish_output --configuration Release
+    - name: Zip files
+      run: 7z u ${{ runner.temp }}/${{ github.run_id }}.zip ./${{ github.workspace }}/publish_output/*
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        name: drop
+        path: "${{ runner.temp }}/${{ github.run_id }}.zip"
+  Deploy-Deploy:
+    name: Deploy
+    needs:
+    - Build-Build
+    runs-on:
+      - self-hosted
+      - "${{ env.vmImageName }}"
+    environment:
+      name: development
+    if: success() && github.RUN_NUMBER == 1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3.1.0
+    - name: download artifact
+      uses: actions/download-artifact@v3.0.1
+    - name: Azure functions app deploy
+      uses: azure/login@v1.4.6
+      with:
+        creds: "${{ secrets.AZURE_CREDENTIALS }}"
+    - name: Azure functions app deploy
+      uses: Azure/functions-action@v1
+      with:
+        app-name: "${{ env.functionAppName }}"
+        package: "${{ runner.workspace }}/drop/${{ github.run_id }}.zip"
+    - name: Update App Settings
+      run: |-
+        # az cli needs an extension for App Insights, so turn on dynamic install to avoid the install prompt
+        az config set extension.use_dynamic_install=yes_without_prompt
+        # Get keys and such from resources and stuff them into variables
+        STORAGE_CONNECTION_STRING=$(az storage account show-connection-string -g ${{ env.resourceGroupName }} -n ${{ env.storageResourceName }} --query "connectionString" -o tsv)
+        FORMS_RECOGNIZER_KEY=$(az cognitiveservices account keys list -g ${{ env.resourceGroupName }} -n ${{ env.formsRecognizerResourceName }} --query "key1" -o tsv)
+        FORMS_RECGONIZER_ENDPOINT=$(az cognitiveservices account show -g ${{ env.resourceGroupName }} -n ${{ env.formsRecognizerResourceName }} --query "properties.endpoint" -o tsv)
+        APP_INSIGHTS_CONNECTION_STRING=$(az monitor app-insights component show -g ${{ env.resourceGroupName }} -a ${{ env.appInsightsResourceName }} --query "connectionString" -o tsv)
+        APP_INSIGHTS_INSTRUMENTATION_KEY=$(az monitor app-insights component show -g ${{ env.resourceGroupName }} -n ${{ env.appInsightsResourceName }} --query "instrumentationKey" -o tsv)
+        # Update the Function config using the values we got from az cli
+        az webapp config appsettings set --name ${{ env.functionAppName }} --resource-group ${{ env.resourceGroupName }} --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" "APPINSIGHTS_INSTRUMENTATIONKEY=$APP_INSIGHTS_INSTRUMENTATION_KEY" "APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECGONIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=${{ env.formsRecognizerModelId }}"
+      shell: bash
