@@ -27,7 +27,7 @@ public class ExtractInvoiceDataActivity
     {
         ExtractInvoiceDataResponse invoiceData;
         var endpoint = Environment.GetEnvironmentVariable("formsRecognizerEndpoint");
-        var key = Environment.GetEnvironmentVariable("formsRecogniserKey");
+        var key = Environment.GetEnvironmentVariable("formsRecognizerKey");
         var modelId = Environment.GetEnvironmentVariable("modelId");
 
 
