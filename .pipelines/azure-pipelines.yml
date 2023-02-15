@@ -3,7 +3,7 @@ trigger:
 
 variables:
   vmImageName: ubuntu-latest
-  azureSubscription: e1f57a36-4892-4716-9a3f-661432b39dbe
+  azureSubscription: CHHOUSE_FDPO
   resourceGroupName: INVOICE-DATA
   functionAppName: km-invoice-ocr-fa
   storageResourceName: kminvoiceocrfa
@@ -85,4 +85,3 @@ stages:
                 APP_INSIGHTS_INSTRUMENTATION_KEY=$(az monitor app-insights component show -g $(resourceGroupName) -n $(appInsightsResourceName) --query "instrumentationKey" -o tsv)
                 # Update the Function config using the values we got from az cli
                 az webapp config appsettings set --name $(functionAppName) --resource-group $(resourceGroupName) --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" "APPINSIGHTS_INSTRUMENTATIONKEY=$APP_INSIGHTS_INSTRUMENTATION_KEY" "APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECGONIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=$(formsRecognizerModelId)"
-                
