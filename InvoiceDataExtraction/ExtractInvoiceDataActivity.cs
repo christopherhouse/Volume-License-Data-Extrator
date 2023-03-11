@@ -16,6 +16,9 @@ namespace InvoiceDataExtraction;
 public class ExtractInvoiceDataActivity
 {
     private readonly TelemetryClient _telemetryClient;
+    private static readonly string _formsRecognizerEndpoint = Environment.GetEnvironmentVariable("formsRecognizerEndpoint");
+    private static readonly string _formsRecognizerKey = Environment.GetEnvironmentVariable("formsRecognizerKey");
+    private static readonly string _formsRecognizerModelId = Environment.GetEnvironmentVariable("modelId");
 
     public ExtractInvoiceDataActivity(TelemetryClient telemetryClient)
     {
@@ -26,26 +29,23 @@ public class ExtractInvoiceDataActivity
     public async Task<ExtractInvoiceDataResponse> ExtractInvoiceData([ActivityTrigger] ExtractInvoiceDataRequest request, ILogger log)
     {
         ExtractInvoiceDataResponse invoiceData;
-        var endpoint = Environment.GetEnvironmentVariable("formsRecognizerEndpoint");
-        var key = Environment.GetEnvironmentVariable("formsRecognizerKey");
-        var modelId = Environment.GetEnvironmentVariable("modelId");
 
-
-        if (!string.IsNullOrWhiteSpace(endpoint) && !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(modelId))
+        if (ValidateConfiguration())
         {
-            var credential = new AzureKeyCredential(key);
+            var credential = new AzureKeyCredential(_formsRecognizerKey);
 
-            var documentAnalysisClient = new DocumentAnalysisClient(new Uri(endpoint), credential);
+            var documentAnalysisClient = new DocumentAnalysisClient(new Uri(_formsRecognizerEndpoint), credential);
 
             try
             {
                 var operation = await documentAnalysisClient.AnalyzeDocumentFromUriAsync(WaitUntil.Completed,
-                    modelId,
+                    _formsRecognizerModelId,
                     request.InvoiceSasUri);
 
                 var results = operation.Value;
 
                 var document = results.Documents.First();
+
                 var fields = document.Fields;
 
                 invoiceData = ExtractInvoiceDataResponse.FromFormFields(fields);
@@ -77,5 +77,11 @@ public class ExtractInvoiceDataActivity
         _telemetryClient.TrackEvent(@event);
 
         return invoiceData;
+    }
+
+    private bool ValidateConfiguration()
+    {
+        return !string.IsNullOrWhiteSpace(_formsRecognizerEndpoint) && !string.IsNullOrWhiteSpace(_formsRecognizerKey) &&
+               !string.IsNullOrWhiteSpace(_formsRecognizerModelId);
     }
 }
