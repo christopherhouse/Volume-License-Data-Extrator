@@ -56,7 +56,7 @@ public class ExtractInvoiceDataResponse
                     response.ExtractedInvoiceTotalConfidence = field.Value.Confidence;
                     break;
                 case "Line Items":
-                    var lineItems = field.Value.AsList();
+                    var lineItems = field.Value.Value.AsList();
 
                     foreach (var lineItem in lineItems)
                     {

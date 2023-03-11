@@ -3,12 +3,12 @@ trigger:
 
 variables:
   vmImageName: ubuntu-latest
-  azureSubscription: 3d514ad5-b23e-4ab6-a3dd-0175e28e21d0
+  azureSubscription: CHHOUSE_FDPO
   resourceGroupName: INVOICE-DATA
-  functionAppName: invdeploytest
-  storageResourceName: invoicedatafunctest
-  formsRecognizerResourceName: K-INVOICE-SCUS
-  appInsightsResourceName: invdeploytest
+  functionAppName: km-invoice-ocr-fa
+  storageResourceName: kminvoiceocrfa
+  formsRecognizerResourceName: km-ms-invoice-fr
+  appInsightsResourceName: km-invoice-ocr-ai
   formsRecognizerModelId: invoices-2022-11-16
 
 stages:
@@ -82,6 +82,6 @@ stages:
                 FORMS_RECOGNIZER_KEY=$(az cognitiveservices account keys list -g $(resourceGroupName) -n $(formsRecognizerResourceName) --query "key1" -o tsv)
                 FORMS_RECGONIZER_ENDPOINT=$(az cognitiveservices account show -g $(resourceGroupName) -n $(formsRecognizerResourceName) --query "properties.endpoint" -o tsv)
                 APP_INSIGHTS_CONNECTION_STRING=$(az monitor app-insights component show -g $(resourceGroupName) -a $(appInsightsResourceName) --query "connectionString" -o tsv)
-                APP_INSIGHTS_INSTRUMENTATION_KEY=$(az monitor app-insights component show -g $(resourceGroupName) -n $(appInsightsResourceName) --query "instrumentationKey" -o tsv)
+                APP_INSIGHTS_INSTRUMENTATION_KEY=$(az monitor app-insights component show -g $(resourceGroupName) -a $(appInsightsResourceName) --query "instrumentationKey" -o tsv)
                 # Update the Function config using the values we got from az cli
                 az webapp config appsettings set --name $(functionAppName) --resource-group $(resourceGroupName) --settings "AzureWebJobsStorage=$STORAGE_CONNECTION_STRING" "APPINSIGHTS_INSTRUMENTATIONKEY=$APP_INSIGHTS_INSTRUMENTATION_KEY" "APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING" "formsRecognizerEndpoint=$FORMS_RECGONIZER_ENDPOINT" "formsRecognizerKey=$FORMS_RECOGNIZER_KEY" "modelId=$(formsRecognizerModelId)"

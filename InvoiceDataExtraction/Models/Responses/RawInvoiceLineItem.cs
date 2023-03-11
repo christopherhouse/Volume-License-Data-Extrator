@@ -79,7 +79,7 @@ public class RawInvoiceLineItem
     {
         var lineItem = new RawInvoiceLineItem();
 
-        var fieldDictionary = lineItems.AsDictionary();
+        var fieldDictionary = lineItems.Value.AsDictionary();
         var lineNumber = GetLineNumber(fieldDictionary);
 
         foreach (var field in fieldDictionary)
